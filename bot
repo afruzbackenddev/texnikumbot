@@ -1,0 +1,264 @@
+import asyncio
+import random
+from aiogram import Bot, Dispatcher, types
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.filters import CommandStart
+
+TOKEN = "8735052740:AAGUJaXvdhvIFCxvbtnueMBll1ZIoxOrsyM"
+bot = Bot(token=TOKEN)
+dp = Dispatcher()
+
+
+menu = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="📚 yonalishlar"), KeyboardButton(text="👥 guruxlar")],
+        [KeyboardButton(text="📞 aloqa uchun")],
+        [KeyboardButton(text="🧠 blitz boshlash")],
+        [KeyboardButton(text="📊 natijalarim")]
+    ],
+    resize_keyboard=True
+)
+
+
+
+questions = [
+    {"q": "HTML nimaning qisqartmasi?",
+     "options": ["A) Hyper Trainer Marking Language", "B) Hyper Text Markup Language", "C) High Text Machine Language"],
+     "answer": "B", "cat": "web"},
+    {"q": "CSS nima uchun ishlatiladi?", "options": ["A) Backend", "B) Dizayn berish", "C) Database"], "answer": "B",
+     "cat": "web"},
+    {"q": "JavaScript qayerda ishlaydi?", "options": ["A) Faqat serverda", "B) Faqat brauzerda", "C) Ikkalasida ham"],
+     "answer": "C", "cat": "web"},
+    {"q": "<h1> teg nimani bildiradi?", "options": ["A) Paragraf", "B) Sarlavha", "C) Link"], "answer": "B",
+     "cat": "web"},
+    {"q": "<p> teg nima uchun?", "options": ["A) Rasm", "B) Paragraf", "C) Tugma"], "answer": "B", "cat": "web"},
+    {"q": "<a> teg nima qiladi?", "options": ["A) Rasm qo‘shadi", "B) Link yaratadi", "C) Rang beradi"], "answer": "B",
+     "cat": "web"},
+    {"q": "CSS da rang berish qaysi property?", "options": ["A) background", "B) color", "C) font"], "answer": "B",
+     "cat": "web"},
+    {"q": "JavaScript da o‘zgaruvchi qanday e'lon qilinadi?", "options": ["A) var", "B) int", "C) string"],
+     "answer": "A", "cat": "web"},
+    {"q": "display: flex; nima qiladi?", "options": ["A) Matnni o‘chiradi", "B) Layoutni moslaydi", "C) Rang beradi"],
+     "answer": "B", "cat": "web"},
+    {"q": "HTML fayl kengaytmasi?", "options": ["A) .py", "B) .html", "C) .js"], "answer": "B", "cat": "web"},
+    {"q": "CSS fayl kengaytmasi?", "options": ["A) .css", "B) .html", "C) .js"], "answer": "A", "cat": "web"},
+    {"q": "JavaScript fayl kengaytmasi?", "options": ["A) .java", "B) .js", "C) .json"], "answer": "B", "cat": "web"},
+    {"q": "<img> tegi nima uchun?", "options": ["A) Matn", "B) Rasm", "C) Link"], "answer": "B", "cat": "web"},
+    {"q": "id va class farqi?", "options": ["A) Bir xil", "B) id bitta, class ko‘p", "C) class bitta"], "answer": "B",
+     "cat": "web"},
+    {"q": "JavaScript da alert nima qiladi?", "options": ["A) Serverni yoqadi", "B) Popup chiqaradi", "C) CSS beradi"],
+     "answer": "B", "cat": "web"},
+    {"q": "HTML da form nima uchun?", "options": ["A) Rasm", "B) Ma’lumot yuborish", "C) Dizayn"], "answer": "B",
+     "cat": "web"},
+    {"q": "input type='text' nima qiladi?", "options": ["A) Tugma", "B) Matn kiritish", "C) Rasm"], "answer": "B",
+     "cat": "web"},
+    {"q": "CSS da margin nima?", "options": ["A) Ichki joy", "B) Tashqi bo‘shliq", "C) Rang"], "answer": "B",
+     "cat": "web"},
+    {"q": "padding nima?", "options": ["A) Ichki bo‘shliq", "B) Tashqi bo‘shliq", "C) Rang"], "answer": "A",
+     "cat": "web"},
+    {"q": "JavaScript da console.log nima qiladi?",
+     "options": ["A) O‘chiradi", "B) Konsolga chiqaradi", "C) Serverga yuboradi"], "answer": "B", "cat": "web"},
+    {"q": "Python nima?", "options": ["A) Dasturlash tili", "B) O‘yin", "C) OS"], "answer": "A", "cat": "python"},
+    {"q": "Python da print nima qiladi?", "options": ["A) O‘chiradi", "B) Ekranga chiqaradi", "C) Fayl yaratadi"], "answer": "B", "cat": "python"},
+    {"q": "int nima?", "options": ["A) Matn", "B) Butun son", "C) Float"], "answer": "B", "cat": "python"},
+    {"q": "float nima?", "options": ["A) Butun son", "B) O‘nlik son", "C) Matn"], "answer": "B", "cat": "python"},
+    {"q": "str nima?", "options": ["A) Son", "B) Matn", "C) List"], "answer": "B", "cat": "python"},
+    {"q": "list nima?", "options": ["A) O‘zgarmas", "B) O‘zgaruvchan kolleksiya", "C) Funksiya"], "answer": "B", "cat": "python"},
+    {"q": "tuple nima?", "options": ["A) O‘zgaruvchan", "B) O‘zgarmas", "C) Funksiya"], "answer": "B", "cat": "python"},
+    {"q": "dict nima?", "options": ["A) Kalit-qiymat", "B) List", "C) String"], "answer": "A", "cat": "python"},
+    {"q": "len() nima qiladi?", "options": ["A) Qo‘shadi", "B) Uzunligini topadi", "C) O‘chiradi"], "answer": "B", "cat": "python"},
+    {"q": "if nima qiladi?", "options": ["A) Takrorlaydi", "B) Shart tekshiradi", "C) Saqlaydi"], "answer": "B", "cat": "python"},
+    {"q": "for nima?", "options": ["A) Shart", "B) Loop", "C) Funksiya"], "answer": "B", "cat": "python"},
+    {"q": "while nima?", "options": ["A) Loop", "B) String", "C) Dict"], "answer": "A", "cat": "python"},
+    {"q": "def nima qiladi?", "options": ["A) Klass yaratadi", "B) Funksiya yaratadi", "C) O‘chiradi"], "answer": "B", "cat": "python"},
+    {"q": "input() nima qiladi?", "options": ["A) Chiqaradi", "B) Kiritadi", "C) O‘chiradi"], "answer": "B", "cat": "python"},
+    {"q": "== nima?", "options": ["A) Tengmi", "B) Qo‘shish", "C) Ayirish"], "answer": "A", "cat": "python"},
+    {"q": "= nima?", "options": ["A) Tengmi", "B) Qiymat berish", "C) Tekshirish"], "answer": "B", "cat": "python"},
+    {"q": "and nima qiladi?", "options": ["A) Yoki", "B) Va", "C) Teng"], "answer": "B", "cat": "python"},
+    {"q": "or nima qiladi?", "options": ["A) Va", "B) Yoki", "C) Teng"], "answer": "B", "cat": "python"},
+    {"q": "not nima qiladi?", "options": ["A) Teskarilaydi", "B) Qo‘shadi", "C) Ayiradi"], "answer": "A", "cat": "python"},
+    {"q": "range() nima qiladi?", "options": ["A) List yaratadi", "B) Ketma-ket son beradi", "C) O‘chiradi"], "answer": "B", "cat": "python"}
+
+]
+
+
+
+
+user_state = {}
+used_questions = {}
+history = {}
+
+
+@dp.message(CommandStart())
+async def start_handler(message: types.Message):
+    await message.answer("🎓 Assalomu alaykum!", reply_markup=menu)
+
+
+@dp.message(lambda m: m.text == "📚 yonalishlar")
+async def yonalishlar(message: types.Message):
+    await message.answer(
+        "📚 Yo‘nalishlar:\n"
+        "1. Kompyuter operatori\n"
+        "2. Melioratsiya\n"
+        "3. Avto ta’mirlash\n"
+        "4. Payvandlash\n"
+        "5. Tikuvchilik"
+    )
+
+@dp.message(lambda m: m.text == "👥 guruxlar")
+async def guruhlar(message: types.Message):
+    await message.answer(
+        "👥 Guruhlar:\n"
+        "Kompyuter: 52/25, 51/25\n"
+        "Melioratsiya: 20/24, 21/24\n"
+        "Avto: 30/24, 31/24\n"
+        "Payvandlash: 60/24, 60/25\n"
+        "Tikuvchilik: 40/25"
+    )
+
+@dp.message(lambda m: m.text == "📞 aloqa uchun")
+async def aloqa(message: types.Message):
+    await message.answer(
+        "📞 Aloqa:\n"
+        "+998 94 933 66 46 - direktor\n"
+        "+998 93 506 11 67 - ustoz\n"
+        "+998 99 886 84 15 - master\n"
+        "+998 99 933 23 43 - rahbar"
+    )
+
+
+@dp.message(lambda m: m.text == "🧠 blitz boshlash")
+async def choose_category(message: types.Message):
+    kb = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="🌐 Web"), KeyboardButton(text="🐍 Python")],
+            [KeyboardButton(text="💻 Umumiy IT")]
+        ],
+        resize_keyboard=True
+    )
+    await message.answer("📚 Yo‘nalishni tanlang:", reply_markup=kb)
+
+
+@dp.message(lambda m: m.text in ["🌐 Web", "🐍 Python", "💻 Umumiy IT"])
+async def start_test(message: types.Message):
+    uid = message.from_user.id
+
+    cat_map = {
+        "🌐 Web": "web",
+        "🐍 Python": "python",
+        "💻 Umumiy IT": "it"
+    }
+
+    user_state[uid] = {
+        "score": 0,
+        "current": None,
+        "category": cat_map[message.text],
+        "total": 0
+    }
+
+    used_questions[uid] = []
+
+    await send_question(message)
+
+
+async def send_question(message: types.Message):
+    uid = message.from_user.id
+    cat = user_state[uid]["category"]
+
+    available = [
+        q for q in questions
+        if q["q"] not in used_questions[uid] and q["cat"] == cat
+    ]
+
+    if not available:
+        score = user_state[uid]["score"]
+        total = user_state[uid]["total"]
+
+        percent = int((score / total) * 100) if total else 0
+
+        if percent >= 90:
+            level = "🔥 PRO"
+        elif percent >= 70:
+            level = "💪 Yaxshi"
+        elif percent >= 50:
+            level = "🙂 O‘rtacha"
+        else:
+            level = "😅 Yaxshilash kerak"
+
+        history.setdefault(uid, []).append({
+            "score": score,
+            "total": total,
+            "percent": percent
+        })
+
+        await message.answer(
+            f"🏁 Test tugadi!\n"
+            f"🎯 {score}/{total}\n"
+            f"📊 {percent}%\n"
+            f"🏅 {level}",
+            reply_markup=menu
+        )
+
+        user_state.pop(uid, None)
+        used_questions.pop(uid, None)
+        return
+
+    q = random.choice(available)
+    used_questions[uid].append(q["q"])
+
+    user_state[uid]["current"] = q
+    user_state[uid]["total"] += 1
+
+    kb = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="A"), KeyboardButton(text="B"), KeyboardButton(text="C")]],
+        resize_keyboard=True
+    )
+
+    await message.answer(
+        f"❓ {user_state[uid]['total']}-savol\n\n"
+        + q["q"] + "\n\n" + "\n".join(q["options"]),
+        reply_markup=kb
+    )
+
+
+@dp.message(lambda m: m.text in ["A", "B", "C"])
+async def answer_handler(message: types.Message):
+    uid = message.from_user.id
+
+    if uid not in user_state:
+        return
+
+    q = user_state[uid]["current"]
+
+    if message.text == q["answer"]:
+        user_state[uid]["score"] += 1
+        await message.answer("✅ To‘g‘ri!")
+    else:
+        await message.answer(f"❌ Noto‘g‘ri! To‘g‘ri: {q['answer']}")
+
+    await asyncio.sleep(1)
+    await send_question(message)
+
+
+@dp.message(lambda m: m.text == "📊 natijalarim")
+async def history_handler(message: types.Message):
+    uid = message.from_user.id
+
+    if uid not in history:
+        await message.answer("📭 Hali test ishlamadingiz")
+        return
+
+    text = "📊 Natijalar:\n\n"
+
+    for i, h in enumerate(history[uid], 1):
+        text += f"{i}. {h['score']}/{h['total']} ({h['percent']}%)\n"
+
+    await message.answer(text)
+
+
+async def main():
+    await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot)
+
+if __name__ == "__main__":
+    asyncio.run(main())
