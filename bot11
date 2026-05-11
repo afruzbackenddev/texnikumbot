@@ -1,0 +1,385 @@
+import asyncio
+import random
+from aiogram import Bot, Dispatcher, types
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from aiogram.filters import CommandStart
+
+TOKEN = "8735052740:AAFag19wPtueWf1OZ_1xEJH8ObawKbBCzeg"
+CHANNEL = "@piskent_1_son_texnikumi"
+
+
+bot = Bot(token=TOKEN)
+dp = Dispatcher()
+
+
+user_state = {}
+
+
+darsjadval = {
+    "52/25": (
+        "📅 52/25 guruh jadvali:\n\n"
+        "Dushanba: 1-Kelajak soati,2-Tarix,3-Informatika\n"
+        "Seshanba: 1-Tarix,2-Xorij tili,3-Kompyter tizimlarini dasturiy taminoti\n"
+        "Chorshanba: 1-Axborot xavfsizligi, 2-Dasturlash asoslari, 3-Kompyter jihozlari\n"
+        "Payshanba: 1-Ona tili, 2-Web dasturlash, 3-Tarbiya\n"
+        "Juma: 1-Shaxsiy kompyter jihozlari, 2-Shaxsiy kompyter jihozlari, 3-Shaxsiy kompyter jihozlari\n"
+        "Shanba: 1-Xorij tili, 2-Matematika, 3-Jismoniya tarbiya"
+    ),
+    "51/25": (
+        "📅 51/25 guruh jadvali:\n\n"
+        "Dushanba: 1-Kelajak soati,2-Xorij tili,3-Tarbiya\n"
+        "Seshanba: 1-Axborot xavfsizligi,2-Informatika,3-Matematika\n"
+        "Chorshanba: 1-Xorij tili, 2-Kompyter jihozlari, 3-Tarix\n"
+        "Payshanba: 1-Shaxsiy kompyter jihozlari, 2-Shaxsiy kompyter jihozlari, 3-Shaxsiy kompyter jihozlari\n"
+        "Juma: 1-Fizika, 2-Tarbiya, 3-Xorij tili\n"
+        "Shanba: 1-Web dasturlash, 2-Ona tili, 3- Rus tili"
+    ),
+    "50/25": (
+         "📅 50-25 guruh jadvali:\n\n"
+         "Dushanba: 1-Kelajak soati, 2-Kompyuter arxitekturasi, 3-Axborot xavfsizligi, 4-Web dasturlash\n"
+          "Seshanba: 1-Xorijiy tili, 2-Tarbiya, 3-Tarix\n"
+         "Chorshanba: 1-Jismoniy tarbiya/Fizika, 2-Xorijiy tili, 3-Matematika\n"
+          "Payshanba: 1-Informatika, 2-Ona tili va adabiyot, 3-CHQBT\n"
+          "Juma: 1-Xorijiy tili, 2-Rus tili, 3-Tarix\n"
+         "Shanba: 1-Kompyuter arxitekturasi, 2-Axborot xavfsizligi, 3-Dasturlash asoslari"
+),
+    "40/25": (
+    "📅 40/25 guruh jadvali (Tikuvchilik):\n\n"
+    "Dushanba: 1-Kelajak soati, 2-Xorijiy tili, 3-Ayollar kiyimini konstruksiyalash\n"
+    "Seshanba: 1-Xorijiy tili, 2-Tarix, 3-Xorijiy tili, 4-Tikuvchilik texnologiyasi\n"
+    "Chorshanba: 1-Fizika/Tikish, 2-Tarix/Tikish, 3-Xorijiy tili/Tikish\n"
+    "Payshanba: 1-Tarbiya, 2-Jismoniy tarbiya/Matematika, 3-Ona tili, 4-Informatika\n"
+    "Juma: 1-Ayollar kiyimini tikish, 2-Ayollar kiyimini tikish, 3-Ayollar kiyimini tikish\n"
+    "Shanba: 1-Ayollar kiyimini tikish, 2-Rus tili, 3-Tarbiya/Rus tili"
+),
+    "60/25": (
+    "📅 60/25 guruh jadvali (Avtomobillarni tamirlash):\n\n"
+    "Dushanba: 1-Kelajak soati, 2-Matematika, 3-Xorijiy tili, 4-Avtomobil elektr jihozlari/Yonilg'i tizimi\n"
+    "Seshanba: 1-Avtomobil tuzilishi, 2-Avtomobil tuzilishi, 3-Avtomobil tuzilishi, 4-Tarbiya\n"
+    "Chorshanba: 1-Tarix, 2-Informatika/Fizika, 3-Xorijiy tili\n"
+    "Payshanba: 1-Yo'l harakati qoidalari, 2-Tarbiya, 3-Avtomobil elektr jihozlari/Dvigatellarga servis\n"
+    "Juma: 1-Tarix, 2-Xorijiy tili, 3-Yo'l harakati/BC toifali avto tuzilishi, 4-Rus tili/CHQBT\n"
+    "Shanba: 1-Rus tili, 2-Jismoniy tarbiya/Matematika, 3-Ona tili"
+),
+    "30/25": (
+    "📅 30/25 guruh jadvali (Avtomobillarni tamirlash):\n\n"
+    "Dushanba: 1-Kelajak soati, 2-Matematika, 3-Xorijiy tili, 4-Avtomobil elektr va elektron jihozlari / Yonilg'i tizimi\n"
+    "Seshanba: 1-Avtomobil tuzilishi O'A, 2-Avtomobil tuzilishi O'A, 3-Avtomobil tuzilishi O'A, 4-Tarbiya\n"
+    "Chorshanba: 1-Tarix, 2-Informatika/Fizika, 3-Xorijiy tili\n"
+    "Payshanba: 1-Yo'l harakati qoidalari, 2-Tarbiya, 3-Avtomobil elektr va elektron jihozlari / Avtomobil dvigatellariga servis\n"
+    "Juma: 1-Tarix, 2-Xorijiy tili, 3-Yo'l harakati qoidalari / BC toifali avto tuzilishi, 4-Rus tili/ChQBT\n"
+    "Shanba: 1-Rus tili, 2-Jismoniy tarbiya/Matematika, 3-Ona tili"
+)
+
+
+}
+
+
+
+questions = [
+    {"q": "HTML nimaning qisqartmasi?", "options": ["A", "B", "C"],
+     "full_options": ["A) Hyper Trainer Marking Language", "B) Hyper Text Markup Language",
+                      "C) High Text Machine Language"], "answer": "B", "cat": "web"},
+    {"q": "CSS nima uchun ishlatiladi?", "options": ["A", "B", "C"],
+     "full_options": ["A) Backend", "B) Dizayn berish", "C) Database"], "answer": "B", "cat": "web"},
+    {"q": "JavaScript qayerda ishlaydi?", "options": ["A", "B", "C"],
+     "full_options": ["A) Server", "B) Brauzer", "C) Ikkalasi"], "answer": "C", "cat": "web"},
+    {"q": "Python nima?", "options": ["A", "B", "C"], "full_options": ["A) Tili", "B) O‘yin", "C) OS"], "answer": "A",
+     "cat": "python"},
+    {"q": "CPU nima?", "options": ["A", "B", "C"], "full_options": ["A) Ekran", "B) Protsessor", "C) Klaviatura"],
+     "answer": "B", "cat": "it"},
+    {"q": "RAM nima qiladi?", "options": ["A", "B", "C"],
+     "full_options": ["A) Saqlaydi", "B) Vaqtinchalik xotira", "C) Internet"], "answer": "B", "cat": "it"},
+    {"q": "HDD nima?", "options": ["A", "B", "C"], "full_options": ["A) Protsessor", "B) Disk", "C) OS"], "answer": "B",
+     "cat": "it"},
+    {"q": "SSD nima?", "options": ["A", "B", "C"], "full_options": ["A) Tez disk", "B) Kabel", "C) Monitor"],
+     "answer": "A", "cat": "it"},
+    {"q": "Internet nima?", "options": ["A", "B", "C"], "full_options": ["A) Tarmoq", "B) Dastur", "C) Fayl"],
+     "answer": "A", "cat": "it"},
+    {"q": "Router nima?", "options": ["A", "B", "C"],
+     "full_options": ["A) Internet tarqatadi", "B) O‘chiradi", "C) Saqlaydi"], "answer": "A", "cat": "it"},
+    {"q": "HTML fayl kengaytmasi?", "options": ["A", "B", "C"], "full_options": ["A) .html", "B) .py", "C) .js"],
+     "answer": "A", "cat": "web"},
+    {"q": "CSS fayl kengaytmasi?", "options": ["A", "B", "C"], "full_options": ["A) .css", "B) .html", "C) .js"],
+     "answer": "A", "cat": "web"},
+    {"q": "JS fayl kengaytmasi?", "options": ["A", "B", "C"], "full_options": ["A) .js", "B) .css", "C) .java"],
+     "answer": "A", "cat": "web"},
+    {"q": "<h1> nima?", "options": ["A", "B", "C"], "full_options": ["A) Paragraf", "B) Sarlavha", "C) Link"],
+     "answer": "B", "cat": "web"},
+    {"q": "<p> nima?", "options": ["A", "B", "C"], "full_options": ["A) Paragraf", "B) Rasm", "C) Link"], "answer": "A",
+     "cat": "web"},
+    {"q": "<a> nima qiladi?", "options": ["A", "B", "C"], "full_options": ["A) Link", "B) Rasm", "C) Rang"],
+     "answer": "A", "cat": "web"},
+    {"q": "CSS color nima?", "options": ["A", "B", "C"], "full_options": ["A) Rang", "B) O‘lcham", "C) Margin"],
+     "answer": "A", "cat": "web"},
+    {"q": "margin nima?", "options": ["A", "B", "C"], "full_options": ["A) Ichki", "B) Tashqi", "C) Rang"],
+     "answer": "B", "cat": "web"},
+    {"q": "padding nima?", "options": ["A", "B", "C"], "full_options": ["A) Ichki", "B) Tashqi", "C) Border"],
+     "answer": "A", "cat": "web"},
+    {"q": "JavaScript var nima?", "options": ["A", "B", "C"],
+     "full_options": ["A) O‘zgaruvchi", "B) Funksiya", "C) Class"], "answer": "A", "cat": "web"},
+    {"q": "console.log nima?", "options": ["A", "B", "C"],
+     "full_options": ["A) O‘chiradi", "B) Konsolga chiqaradi", "C) Server"], "answer": "B", "cat": "web"},
+    {"q": "Python print nima qiladi?", "options": ["A", "B", "C"],
+     "full_options": ["A) O‘chiradi", "B) Chiqaradi", "C) Saqlaydi"], "answer": "B", "cat": "python"},
+    {"q": "int nima?", "options": ["A", "B", "C"], "full_options": ["A) Matn", "B) Butun son", "C) O‘nlik"],
+     "answer": "B", "cat": "python"},
+    {"q": "float nima?", "options": ["A", "B", "C"], "full_options": ["A) O‘nlik son", "B) Matn", "C) List"],
+     "answer": "A", "cat": "python"},
+    {"q": "list nima?", "options": ["A", "B", "C"], "full_options": ["A) O‘zgarmas", "B) O‘zgaruvchan", "C) Funksiya"],
+     "answer": "B", "cat": "python"},
+    {"q": "dict nima?", "options": ["A", "B", "C"], "full_options": ["A) Kalit-qiymat", "B) List", "C) String"],
+     "answer": "A", "cat": "python"},
+
+    {"q": "if nima qiladi?", "options": ["A", "B", "C"], "full_options": ["A) Loop", "B) Shart", "C) Funksiya"],
+     "answer": "B", "cat": "python"},
+    {"q": "for nima?", "options": ["A", "B", "C"], "full_options": ["A) Loop", "B) Shart", "C) O‘zgaruvchi"],
+     "answer": "A", "cat": "python"},
+    {"q": "def nima?", "options": ["A", "B", "C"], "full_options": ["A) Funksiya", "B) Class", "C) O‘zgaruvchi"],
+     "answer": "A", "cat": "python"},
+    {"q": "== nima?", "options": ["A", "B", "C"], "full_options": ["A) Teng", "B) Qo‘shish", "C) Ayirish"],
+     "answer": "A", "cat": "python"},
+    {"q": "= nima?", "options": ["A", "B", "C"], "full_options": ["A) Tenglik", "B) Qiymat berish", "C) Tekshirish"],
+     "answer": "B", "cat": "python"},
+    {"q": "and nima?", "options": ["A", "B", "C"], "full_options": ["A) Va", "B) Yoki", "C) Teng"], "answer": "A",
+     "cat": "python"},
+    {"q": "or nima?", "options": ["A", "B", "C"], "full_options": ["A) Va", "B) Yoki", "C) Teng"], "answer": "B",
+     "cat": "python"},
+    {"q": "not nima?", "options": ["A", "B", "C"], "full_options": ["A) Teskarilaydi", "B) Qo‘shadi", "C) O‘chiradi"],
+     "answer": "A", "cat": "python"},
+    {"q": "len() nima?", "options": ["A", "B", "C"], "full_options": ["A) Uzunlik", "B) Qo‘shish", "C) O‘chirish"],
+     "answer": "A", "cat": "python"},
+    {"q": "input() nima?", "options": ["A", "B", "C"], "full_options": ["A) Kiritish", "B) Chiqarish", "C) Saqlash"],
+     "answer": "A", "cat": "python"},
+    {"q": "Monitor nima?", "options": ["A", "B", "C"], "full_options": ["A) Ekran", "B) Klaviatura", "C) CPU"],
+     "answer": "A", "cat": "it"},
+    {"q": "Keyboard nima?", "options": ["A", "B", "C"], "full_options": ["A) Klaviatura", "B) Monitor", "C) Mouse"],
+     "answer": "A", "cat": "it"},
+    {"q": "Mouse nima?", "options": ["A", "B", "C"], "full_options": ["A) Sichqoncha", "B) Printer", "C) Disk"],
+     "answer": "A", "cat": "it"},
+    {"q": "BIOS nima?", "options": ["A", "B", "C"], "full_options": ["A) Yuklash tizimi", "B) O‘yin", "C) Browser"],
+     "answer": "A", "cat": "it"},
+    {"q": "Cloud nima?", "options": ["A", "B", "C"], "full_options": ["A) Internet xizmat", "B) Telefon", "C) OS"],
+     "answer": "A", "cat": "it"},
+    {"q": "LAN nima?", "options": ["A", "B", "C"], "full_options": ["A) Lokal tarmoq", "B) Katta tarmoq", "C) OS"],
+     "answer": "A", "cat": "it"},
+    {"q": "Virus nima?", "options": ["A", "B", "C"], "full_options": ["A) Zararli dastur", "B) Himoya", "C) OS"],
+     "answer": "A", "cat": "it"},
+    {"q": "Antivirus nima qiladi?", "options": ["A", "B", "C"],
+     "full_options": ["A) Himoya", "B) O‘chirish", "C) O‘yin"], "answer": "A", "cat": "it"}
+]
+
+
+menu = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="📅 dars jadval")],
+        [KeyboardButton(text="📚 yonalishlar"), KeyboardButton(text="👥 guruxlar")],
+        [KeyboardButton(text="📞 aloqa uchun")],
+        [KeyboardButton(text="🧠 blitz boshlash")],
+        [KeyboardButton(text="📊 natijalarim")]
+    ],
+    resize_keyboard=True
+)
+
+blitz_kb = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="🐍 Python"), KeyboardButton(text="🌐 Web")],
+        [KeyboardButton(text="💻 IT"), KeyboardButton(text="📚 Umumiy")],
+        [KeyboardButton(text="🔙 Ortga")]
+    ],
+    resize_keyboard=True
+)
+
+group_kb = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="52/25"), KeyboardButton(text="51/25")],
+        [KeyboardButton(text="50/25"), KeyboardButton(text="40/25")],
+        [KeyboardButton(text="60/25"), KeyboardButton(text="30/25")],
+        [KeyboardButton(text="🔙 Ortga")]
+    ],
+    resize_keyboard=True
+)
+
+
+
+
+
+async def check_sub(user_id):
+    try:
+        member = await bot.get_chat_member(CHANNEL, user_id)
+        return member.status in ("member", "administrator", "creator")
+    except:
+        return False
+
+
+async def send_blitz_question(chat_id, category):
+    uid = chat_id
+    available = questions if category == "all" else [q for q in questions if q["cat"] == category]
+    q = random.choice(available)
+    count = user_state[uid].get("quiz_count", 0) + 1
+    text = f"🔟 Savol {count}/10\n\n❓ {q['q']}\n\n" + "\n".join(q['full_options'])
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text=opt, callback_data=f"ans_{opt}_{q['answer']}_{q['cat']}")] for opt in ["A", "B", "C"]
+    ])
+    await bot.send_message(chat_id, text, reply_markup=kb)
+
+
+
+@dp.message(CommandStart())
+async def start_cmd(message: types.Message):
+    await show_main_menu(message)
+
+
+back_kb = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton(text="🔙 Ortga")]],
+    resize_keyboard=True
+)
+
+
+async def show_main_menu(message):
+    uid = message.from_user.id
+
+    if not await check_sub(uid):
+        kb = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(
+                text="📢 Kanalga a'zo bo'lish",
+                url="https://t.me/piskent_1_son_texnikumi"
+            )],
+            [InlineKeyboardButton(
+                text="✅ Tekshirish",
+                callback_data="check_sub"
+            )]
+        ])
+
+        await message.answer(
+            "❗️ Botdan foydalanish uchun kanalimizga a'zo bo'ling!",
+            reply_markup=kb
+        )
+        return
+
+    if uid not in user_state:
+        user_state[uid] = {
+            "score": 0,
+            "total": 0,
+            "quiz_count": 0,
+            "current_quiz_score": 0,
+            "by_cat": {
+                "web": 0,
+                "python": 0,
+                "it": 0
+            },
+            "last_cat": "all"
+        }
+
+    await message.answer(
+        "🏠 Asosiy menyu",
+        reply_markup=menu
+    )
+@dp.message(lambda m: m.text == "🔙 Ortga")
+async def back_menu(message: types.Message):
+    await show_main_menu(message)
+
+@dp.message(lambda m: m.text == "📞 aloqa uchun")
+async def aloqa(message: types.Message):
+    await message.answer(
+        "📞 **Aloqa uchun raqamlar:**\n\n"
+        "👤 +998 94 933 66 46 - Direktor\n"
+        "👨‍🏫 +998 93 506 11 67 - Ustoz\n"
+        "🛠 +998 99 886 84 15 - 52/25 Masteri\n"
+        "👥 +998 99 933 23 43 - 52/25 Rahbari",
+        reply_markup=back_kb,
+        parse_mode="Markdown"
+    )
+
+
+@dp.message(lambda m: m.text == "📚 yonalishlar")
+async def fields(message: types.Message):
+    text = ("📚 **Texnikumdagi yo'nalishlar:**\n\n1. Axborot vositalari mashinalari va   kompyuter tarmoqlari operatori - gurux rahbari raqami 99 933 2343, 94 978 1973, 99 483 9943\n"
+            "2. Tikuvchilik - gurux rahbari raqami 99 630 9097\n"
+            "3. Avtomabillarni  tamirlash va ularga xizmat ko'rsatish -  gurux rahbari raqami 90 329 2114"
+            "3. Payvandlovchi (Elektrogaz payvadchisi -  gurux rahbari raqami 94 637 5418")
+    await message.answer(text, reply_markup=back_kb, parse_mode="Markdown")
+
+
+@dp.message(lambda m: m.text == "📅 dars jadval" or m.text == "👥 guruxlar")
+async def groups_menu(message: types.Message):
+    await message.answer("Jadvalini ko'rmoqchi bo'lgan guruhingizni tanlang:", reply_markup=group_kb)
+
+
+@dp.message(lambda m: m.text in darsjadval.keys())
+async def show_timetable(message: types.Message):
+    text = darsjadval.get(message.text)
+    await message.answer(text, reply_markup=back_kb)
+
+
+@dp.message(lambda m: m.text == "🧠 blitz boshlash")
+async def blitz_start(message: types.Message):
+    uid = message.from_user.id
+    user_state[uid]["quiz_count"] = 0
+    user_state[uid]["current_quiz_score"] = 0
+    await message.answer("Yo'nalishni tanlang (Test 10 ta savoldan iborat):", reply_markup=blitz_kb)
+
+
+@dp.message(lambda m: m.text in ["🐍 Python", "🌐 Web", "💻 IT", "📚 Umumiy"])
+async def handle_quiz_cat(message: types.Message):
+    cat_map = {"🐍 Python": "python", "🌐 Web": "web", "💻 IT": "it", "📚 Umumiy": "all"}
+    user_state[message.from_user.id]["last_cat"] = cat_map[message.text]
+    await send_blitz_question(message.chat.id, cat_map[message.text])
+
+
+@dp.callback_query(lambda c: c.data.startswith("ans_"))
+async def check_answer(callback: CallbackQuery):
+    data = callback.data.split("_")
+    user_ans = data[1]
+    correct_ans = data[2]
+    cat = data[3]
+    uid = callback.from_user.id
+
+    if user_ans == correct_ans:
+        user_state[uid]["score"] += 1
+        user_state[uid]["current_quiz_score"] += 1
+        user_state[uid]["by_cat"][cat] = user_state[uid]["by_cat"].get(cat, 0) + 1
+        await callback.answer("✅ To'g'ri!")
+    else:
+        await callback.answer(f"❌ Noto'g'ri! Javob: {correct_ans}", show_alert=True)
+
+    user_state[uid]["total"] += 1
+    user_state[uid]["quiz_count"] += 1
+    await callback.message.delete()
+
+
+    if user_state[uid]["quiz_count"] >= 10:
+        score = user_state[uid]["current_quiz_score"]
+        await callback.message.answer(
+            f"🏁 **Test yakunlandi!**\n\nSiz 10 ta savoldan **{score}** tasiga to'g'ri javob berdingiz.",
+            reply_markup=menu)
+        user_state[uid]["quiz_count"] = 0
+    else:
+        await send_blitz_question(callback.message.chat.id, user_state[uid]["last_cat"])
+
+
+@dp.message(lambda m: m.text == "📊 natijalarim")
+async def show_stats(message: types.Message):
+    uid = message.from_user.id
+    s = user_state.get(uid, {"score": 0, "total": 0, "by_cat": {"web": 0, "python": 0, "it": 0}})
+    text = (f"📊 **Umumiy statistika:**\n\n✅ Jami to'g'ri: {s['score']}\n📝 Jami urinishlar: {s['total']}\n\n"
+            f"🐍 Python: {s['by_cat'].get('python', 0)}\n🌐 Web: {s['by_cat'].get('web', 0)}\n💻 IT: {s['by_cat'].get('it', 0)}")
+    await message.answer(text, parse_mode="Markdown")
+
+
+@dp.callback_query(lambda c: c.data == "check_sub")
+async def check_sub_btn(c: CallbackQuery):
+    if await check_sub(c.from_user.id):
+        await c.answer("✅ Tasdiqlandi!")
+        await show_main_menu(c.message)
+    else:
+        await c.answer("❌ Kanalga a'zo bo'ling!", show_alert=True)
+
+
+async def main():
+    print("Bot ishga tushdi...")
+    await dp.start_polling(bot)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
